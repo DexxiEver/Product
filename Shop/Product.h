@@ -1,29 +1,47 @@
 #include <string>
 #include <iostream>
+#include <set>
+
+std::set<std::string> Product::UsedIds;
 
 class Product
 {
+    static std::set<std::string> UsedIds;
 private:
     const std::string Id;
     std::string Name;
     double Price;
     int StockQuantity;
-
+    std::string ExpirationDate;
 public:
-    Product(const std::string& id, const std::string& name, double price, int stockQuantity) : Id(id)
+    Product(const std::string& id, const std::string& name, double price, int stockQuantity, const std::string& expirationDate) : Id(id)
     {
-        if (Id.empty()) 
+        if (Id.empty() || UsedIds.count(Id)) 
         {
-            std::cout << "ID не может быть пустым, введите ID: ";
-
             std::string newId;
-            std::cin >> newId;
-            const_cast<std::string&>(Id) = newId;
+            while (true)
+            {
+                std::cout << "Введите ID: ";
+                std::cin >> newId;
+                if (newId.empty())
+                {
+                    std::cout << "ID не может быть пустым\n";
+                    continue;
+                }
+                if (UsedIds.count(newId))
+                {
+                    std::cout << "ID уже существует, введите другой\n";
+                    continue;
+                }
+                const_cast<std::string&>(Id) = newId;
+                break;
+            }
         }
-
+        UsedIds.insert(Id);
         SetName(name);
         SetPrice(price);
         SetStock(stockQuantity);
+        SetExpirationDate(expirationDate);
     }
 
 
@@ -47,6 +65,10 @@ public:
         return StockQuantity;
     }
 
+    const std::string& GetExpirationDate(const std::string& date)
+    {
+        return ExpirationDate;
+    }
 
     void ChangePrice(double newPrice)
     {
@@ -160,6 +182,25 @@ private:
                 continue;
             }
             StockQuantity = input;
+
+            break;
+        }
+    }
+
+
+    void SetExpirationDate(const std::string& date)
+    {
+        std::string input = date;
+        while (true) 
+        {
+            if (input.empty()) 
+            {
+                std::cout << "Срок годности не может быть пустым\nВведите дату: ";
+
+                std::cin >> input;
+                continue;
+            }
+            ExpirationDate = input;
 
             break;
         }
